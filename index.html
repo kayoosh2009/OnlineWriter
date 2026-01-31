@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Text Editor</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f5f5f7;
+            color: #1d1d1f;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #editor {
+            flex: 1;
+            width: 100%;
+            padding: 40px;
+            border: none;
+            outline: none;
+            font-size: 18px;
+            line-height: 1.6;
+            resize: none;
+            background: transparent;
+            color: #333;
+        }
+
+        footer {
+            padding: 15px 40px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid #d2d2d7;
+            font-size: 14px;
+            color: #86868b;
+            display: flex;
+            gap: 20px;
+        }
+
+        .stat-item {
+            font-variant-numeric: tabular-nums;
+        }
+    </style>
+</head>
+<body>
+
+    <textarea id="editor" placeholder="Начните писать..."></textarea>
+
+    <footer>
+        <div class="stat-item" id="charCount">0 chars</div>
+        <div class="stat-item" id="wordCount">0 words</div>
+        <div class="stat-item" id="sizeMB">0 MB</div>
+    </footer>
+
+    <script>
+        const editor = document.getElementById('editor');
+        const charCount = document.getElementById('charCount');
+        const wordCount = document.getElementById('wordCount');
+        const sizeMB = document.getElementById('sizeMB');
+
+        // Загрузка данных из LocalStorage при открытии
+        window.onload = () => {
+            const savedText = localStorage.getItem('savedText');
+            if (savedText) {
+                editor.value = savedText;
+                updateStats();
+            }
+        };
+
+        // Функция обновления статистики
+        function updateStats() {
+            const text = editor.value;
+            
+            // Считаем символы
+            const chars = text.length;
+            
+            // Считаем слова
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            
+            // Считаем размер (UTF-16 использует ~2 байта на символ)
+            const bytes = chars * 2;
+            const mb = (bytes / (1024 * 1024)).toFixed(4);
+
+            charCount.textContent = `${chars} chars`;
+            wordCount.textContent = `${words} words`;
+            sizeMB.textContent = `${mb} MB`;
+
+            // Сохранение в LocalStorage
+            localStorage.setItem('savedText', text);
+        }
+
+        // Слушатель событий на ввод текста
+        editor.addEventListener('input', updateStats);
+    </script>
+</body>
+</html>
